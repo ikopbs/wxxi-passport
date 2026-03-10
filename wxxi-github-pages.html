@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Support WXXI Public Media and enjoy WXXI Passport streaming access with a monthly or one-time donation.">
+<meta property="og:title" content="WXXI Passport – Support Public Media">
+<meta property="og:description" content="Become a WXXI station member and enjoy Passport streaming access.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#000525">
+<title>WXXI Passport</title>
+<style>
+  @font-face {
+    font-family: 'PBS Sans';
+    font-weight: 400;
+    src: url('https://www-tc.pbs.org/pbsfonts/v1.2/PBSSans.woff2') format('woff2'),
+         url('https://www-tc.pbs.org/pbsfonts/v1.2/PBSSans.woff') format('woff');
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'PBS Sans';
+    font-weight: 500;
+    src: url('https://www-tc.pbs.org/pbsfonts/v1.2/PBSSans-Medium.woff2') format('woff2'),
+         url('https://www-tc.pbs.org/pbsfonts/v1.2/PBSSans-Medium.woff') format('woff');
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'PBS Sans';
+    font-weight: 700;
+    src: url('https://www-tc.pbs.org/pbsfonts/v1.2/PBSSans-Bold.woff2') format('woff2'),
+         url('https://www-tc.pbs.org/pbsfonts/v1.2/PBSSans-Bold.woff') format('woff');
+    font-display: swap;
+  }
+
+  :root {
+    --pbs-blue:      #2638c4;
+    --medium-blue:   #0f1e8c;
+    --navy-blue:     #0a145a;
+    --passport-blue: #5680ff;
+    --pbs-blue-d20:  #1e2d9d;
+    --midnight:      #000525;
+    --paynes-gray:   #171b33;
+    --charcoal:      #1e2030;
+    --shadow:        #363846;
+    --blue-gray:     #3d4a6b;
+    --slate:         #5c6e85;
+    --pebble:        #94a1b2;
+    --moon:          #c0cbda;
+    --white:         #ffffff;
+    --yellow:        #ffcf00;
+    --coral:         #fe704e;
+    --green:         #087b45;
+    --onyx:          #040613;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+
+  body {
+    font-family: 'PBS Sans', system-ui, sans-serif;
+    background: #060a1a;
+    color: var(--white);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+
+  .phone-shell {
+    width: 375px;
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: relative;
+    background: var(--midnight);
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+  @media (max-width: 390px) { .phone-shell { width: 100vw; } }
+
+  /* ── Sticky nav ── */
+  .sticky-nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 18px;
+    gap: 8px;
+    background: rgba(0, 5, 37, 0.55);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border-bottom: 1px solid rgba(86, 128, 255, 0.15);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-6px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  .sticky-nav.visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+  .sticky-logo {
+    width: 22px; height: 22px;
+    background: var(--passport-blue);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; flex-shrink: 0;
+  }
+  .sticky-title { font-size: 15px; font-weight: 700; letter-spacing: 0.01em; }
+
+  /* ── Hero ── */
+  .hero {
+    position: relative;
+    margin-top: -44px;
+    height: 210px;
+    overflow: hidden;
+    background: linear-gradient(160deg, var(--navy-blue) 0%, var(--medium-blue) 55%, var(--pbs-blue-d20) 100%);
+  }
+  .hero-grid {
+    position: absolute; inset: 0;
+    display: grid;
+    grid-template-columns: repeat(5,1fr);
+    grid-template-rows: repeat(3,1fr);
+    gap: 3px; opacity: 0.4; pointer-events: none;
+  }
+  .hero-grid span { background: linear-gradient(135deg, var(--medium-blue), var(--navy-blue)); border-radius: 2px; }
+  .hero-grid span:nth-child(odd) { background: linear-gradient(135deg, var(--pbs-blue), var(--medium-blue)); }
+  .hero-grid span:nth-child(3n) { background: linear-gradient(135deg, var(--passport-blue), var(--pbs-blue)); opacity:.6; }
+  .hero-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, rgba(0,5,37,.1) 0%, rgba(0,5,37,.75) 100%);
+    display: flex; align-items: flex-end; justify-content: center;
+    padding-bottom: 22px; pointer-events: none;
+  }
+  .hero-title {
+    font-size: 22px; font-weight: 700; letter-spacing: .01em;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .hero-logo {
+    width: 26px; height: 26px; background: var(--passport-blue); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; flex-shrink: 0;
+  }
+
+  /* ── Intro ── */
+  .intro { padding: 20px 18px 0; }
+  .description { font-size: 14px; line-height: 1.6; color: var(--moon); margin-bottom: 14px; }
+  .description strong { color: var(--white); font-weight: 700; }
+  .passport-link { color: var(--yellow); font-weight: 700; }
+
+  /* ── Donation section ── */
+  .donation-section { padding: 0 18px 48px; }
+  .section-label { text-align: center; font-weight: 700; font-size: 15px; margin-bottom: 12px; padding-top: 20px; }
+
+  /* ── Freq tabs ── */
+  .freq-tabs {
+    display: flex; background: var(--paynes-gray);
+    border-radius: 24px; padding: 3px; margin-bottom: 18px;
+  }
+  .freq-tab {
+    flex: 1; padding: 8px 0; text-align: center; font-size: 13px;
+    font-weight: 500; color: var(--pebble); border-radius: 20px;
+    cursor: pointer; transition: background .2s, color .2s;
+    border: none; background: transparent; font-family: inherit;
+  }
+  .freq-tab.active { background: var(--white); color: var(--midnight); font-weight: 700; }
+
+  /* ── Tier cards ── */
+  .tiers { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+
+  .tier-card {
+    background: var(--charcoal);
+    border: 1.5px solid var(--shadow);
+    border-radius: 10px;
+    transition: border-color .2s, background .2s;
+    overflow: hidden;
+  }
+  .tier-card.selected { border-color: var(--passport-blue); background: var(--paynes-gray); }
+
+  .tier-header {
+    display: flex; align-items: center;
+    padding: 14px 14px 0; gap: 10px; cursor: pointer;
+  }
+  .tier-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--passport-blue); flex-shrink: 0; pointer-events: none; }
+  .tier-name { flex: 1; font-size: 15px; font-weight: 700; color: var(--passport-blue); pointer-events: none; }
+  .tier-price { font-size: 14px; font-weight: 500; color: var(--pebble); margin-right: 6px; pointer-events: none; }
+  .tier-radio {
+    width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--slate);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: border-color .2s; pointer-events: none;
+  }
+  .tier-card.selected .tier-radio { border-color: var(--passport-blue); }
+  .tier-radio-inner { width: 10px; height: 10px; border-radius: 50%; background: var(--passport-blue); opacity: 0; transition: opacity .15s; }
+  .tier-card.selected .tier-radio-inner { opacity: 1; }
+
+  .tier-peek { padding: 10px 14px 0; pointer-events: none; }
+  .tier-benefits-label { font-size: 12px; color: var(--slate); margin-bottom: 8px; }
+
+  .tier-peek-list {
+    position: relative; max-height: 52px; overflow: hidden;
+    transition: max-height .35s cubic-bezier(.4,0,.2,1);
+  }
+  .tier-card.expanded .tier-peek-list { max-height: 400px; }
+  .tier-peek-list::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 28px;
+    background: linear-gradient(to bottom, transparent, var(--charcoal));
+    transition: opacity .2s; pointer-events: none;
+  }
+  .tier-card.selected .tier-peek-list::after { background: linear-gradient(to bottom, transparent, var(--paynes-gray)); }
+  .tier-card.expanded .tier-peek-list::after { opacity: 0; }
+
+  .tier-benefits { list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .tier-benefits li { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; color: var(--moon); line-height: 1.4; }
+  .benefit-check {
+    width: 16px; height: 16px; background: var(--green); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px;
+  }
+  .benefit-check svg { width: 9px; height: 9px; }
+
+  .tier-extra {
+    max-height: 0; overflow: hidden; opacity: 0;
+    transition: max-height .35s cubic-bezier(.4,0,.2,1), opacity .25s ease, padding .25s;
+    padding: 0 14px; pointer-events: none;
+  }
+  .tier-card.expanded .tier-extra { max-height: 120px; opacity: 1; padding: 10px 14px 0; }
+  .tier-desc { font-size: 12px; color: var(--slate); line-height: 1.55; font-style: italic; border-left: 2px solid var(--pbs-blue); padding-left: 9px; }
+
+  .tier-footer {
+    display: flex; justify-content: center; align-items: center;
+    padding: 8px 14px 10px; gap: 5px;
+    font-size: 11px; color: var(--slate); cursor: pointer; transition: color .2s;
+  }
+  .tier-card.selected .tier-footer { color: var(--passport-blue); }
+  .tier-footer svg { width: 13px; height: 13px; transition: transform .28s cubic-bezier(.4,0,.2,1); flex-shrink: 0; pointer-events: none; }
+  .tier-card.expanded .tier-footer svg { transform: rotate(180deg); }
+  .tier-footer-label { font-size: 11px; font-weight: 500; pointer-events: none; }
+
+  .tier-highest {
+    background: var(--onyx); text-align: center; padding: 10px 14px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+    color: var(--yellow); pointer-events: none;
+  }
+
+  /* ── Custom amount ── */
+  .custom-amount {
+    display: flex; align-items: center;
+    border: 1.5px solid var(--shadow); border-radius: 8px;
+    padding: 12px 14px; gap: 8px;
+    background: var(--charcoal); margin-bottom: 22px;
+    transition: border-color .2s;
+  }
+  .custom-amount:focus-within { border-color: var(--passport-blue); }
+  .custom-amount span { color: var(--slate); font-size: 14px; }
+  .custom-amount input {
+    flex: 1; background: transparent; border: none; outline: none;
+    font-family: inherit; font-size: 14px; color: var(--moon);
+  }
+  .custom-amount input::placeholder { color: var(--slate); }
+
+  /* ── Payment ── */
+  .payment-label { text-align: center; font-weight: 700; font-size: 15px; margin-bottom: 12px; }
+  .payment-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .pay-btn {
+    background: var(--charcoal); border: 1.5px solid var(--shadow); border-radius: 8px; padding: 12px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-family: inherit; font-size: 13px; font-weight: 500; color: var(--pebble); cursor: pointer;
+    transition: border-color .2s, background .2s, color .2s;
+  }
+  .pay-btn:hover { border-color: var(--blue-gray); color: var(--moon); }
+  .pay-btn.active { border-color: var(--passport-blue); background: var(--paynes-gray); color: var(--white); }
+  .pay-btn svg { width: 18px; height: 18px; }
+
+  .processing-fee {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 12px; color: var(--moon); margin-bottom: 18px; line-height: 1.5; cursor: pointer;
+  }
+  .processing-fee input[type=checkbox] { margin-top: 2px; accent-color: var(--passport-blue); flex-shrink: 0; }
+
+  .donate-btn {
+    width: 100%; padding: 15px; border-radius: 30px; border: none;
+    background: linear-gradient(135deg, var(--pbs-blue) 0%, var(--medium-blue) 100%);
+    color: var(--white); font-family: inherit; font-size: 16px; font-weight: 700;
+    cursor: pointer; transition: opacity .2s, transform .1s;
+    margin-bottom: 14px; letter-spacing: .01em;
+  }
+  .donate-btn:hover { opacity: .9; }
+  .donate-btn:active { transform: scale(.99); }
+
+  .local-note { text-align: center; font-size: 12px; color: var(--slate); }
+  .local-note .heart { color: var(--coral); margin-right: 4px; }
+</style>
+</head>
+<body>
+<div class="phone-shell" id="phoneShell">
+
+  <div class="sticky-nav" id="stickyNav">
+    <div class="sticky-logo">W</div>
+    <span class="sticky-title">WXXI ✦ Passport</span>
+  </div>
+
+  <div class="hero">
+    <div class="hero-grid" id="heroGrid"></div>
+    <div class="hero-overlay">
+      <div class="hero-title">
+        <div class="hero-logo">W</div>
+        WXXI ✦ Passport
+      </div>
+    </div>
+  </div>
+
+  <div class="intro">
+    <p class="description">Support WXXI to ensure programs that educate, inform, and inspire continue to thrive in our community. Your donation makes a difference!</p>
+    <p class="description"><strong>With a donation of at least $5 per month or a one-time donation of $60, become a station member and enjoy <span class="passport-link">WXXI Passport</span>.</strong></p>
+  </div>
+
+  <div class="donation-section" id="donationSection">
+    <div class="section-label">Donation Amount</div>
+    <div class="freq-tabs">
+      <button class="freq-tab active" data-freq="monthly">Give Monthly</button>
+      <button class="freq-tab" data-freq="yearly">Yearly</button>
+      <button class="freq-tab" data-freq="once">One-time</button>
+    </div>
+    <div class="tiers" id="tiers"></div>
+    <div class="custom-amount">
+      <span>$</span>
+      <input type="number" placeholder="Enter custom amount" min="1">
+    </div>
+    <div class="payment-label">Payment Method</div>
+    <div class="payment-grid">
+      <button class="pay-btn active">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        Credit Card
+      </button>
+      <button class="pay-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-6 9 6v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Bank Account
+      </button>
+      <button class="pay-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
+        Apple Pay
+      </button>
+      <button class="pay-btn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M7 11.5C7 9 9.5 7 12 7h5c2 0 3 1 3 3s-1.5 3-3 3h-2l-1 4H9l1-4H8c-1 0-1-.5-1-1.5z"/><path d="M5 10.5C5 8 7 6 9.5 6"/></svg>
+        PayPal
+      </button>
+    </div>
+    <label class="processing-fee">
+      <input type="checkbox">
+      Maximize my impact by adding 4% to help with processing fees.
+    </label>
+    <button class="donate-btn" id="donateBtn">Donate $5/mo</button>
+    <p class="local-note"><span class="heart">❤</span>Your donation goes to your local station!</p>
+  </div>
+
+</div>
+<script>
+var freqData = {
+  monthly: [
+    { name:'WXXI Member',    price:'$5/mo',   benefits:['WXXI Passport streaming access','Monthly member newsletter'], desc:'A great way to start supporting WXXI and unlock exclusive streaming content.' },
+    { name:'WXXI Supporter', price:'$10/mo',  benefits:['WXXI Passport streaming access','Monthly member newsletter','Behind-the-scenes content','Invitations to member events'], desc:'Take your support further with behind-the-scenes access and local event invitations.' },
+    { name:'WXXI Sustainer', price:'$20/mo',  benefits:['WXXI Passport streaming access','Monthly member newsletter','Behind-the-scenes content','Invitations to member events','Early access to new programs','Exclusive Sustainer recognition'], desc:'Our most popular tier — comprehensive benefits and recognition as a valued sustaining partner.' },
+    { name:'WXXI Champion',  price:'$50/mo',  benefits:['All Sustainer benefits','Annual station tour','On-air acknowledgement','VIP access to special events','Personalized thank-you gift'], desc:'Make a transformative impact on public media in the Rochester community.' }
+  ],
+  yearly: [
+    { name:'WXXI Member',    price:'$60/yr',  benefits:['WXXI Passport streaming access','Monthly member newsletter'], desc:'Annual membership with full Passport access — a saving versus monthly giving.' },
+    { name:'WXXI Supporter', price:'$120/yr', benefits:['WXXI Passport streaming access','Monthly member newsletter','Behind-the-scenes content','Invitations to member events'], desc:'Annual Supporter level with event invitations and exclusive content.' },
+    { name:'WXXI Sustainer', price:'$240/yr', benefits:['WXXI Passport streaming access','Monthly member newsletter','Behind-the-scenes content','Invitations to member events','Early access to new programs','Exclusive Sustainer recognition'], desc:'Best value — all benefits with one annual payment.' },
+    { name:'WXXI Champion',  price:'$600/yr', benefits:['All Sustainer benefits','Annual station tour','On-air acknowledgement','VIP access to special events','Personalized thank-you gift'], desc:'Champion-level impact with full VIP recognition for the year.' }
+  ],
+  once: [
+    { name:'WXXI Member',    price:'$60',  benefits:['WXXI Passport streaming access','Monthly member newsletter'], desc:'A one-time gift that qualifies you for a full year of Passport access.' },
+    { name:'WXXI Supporter', price:'$120', benefits:['WXXI Passport streaming access','Monthly member newsletter','Behind-the-scenes content'], desc:'A meaningful one-time contribution with expanded benefits.' },
+    { name:'WXXI Sustainer', price:'$250', benefits:['WXXI Passport streaming access','Monthly member newsletter','Behind-the-scenes content','Early access to new programs'], desc:'A generous gift that sustains local public media.' },
+    { name:'WXXI Champion',  price:'$500', benefits:['All Sustainer benefits','On-air acknowledgement','VIP event access'], desc:'Champion your community with a significant one-time contribution.' }
+  ]
+};
+
+var currentFreq = 'monthly';
+var selectedIdx  = 0;
+var expandedIdx  = -1;
+
+var heroGrid = document.getElementById('heroGrid');
+for (var g = 0; g < 15; g++) { heroGrid.appendChild(document.createElement('span')); }
+
+var checkSvg   = '<svg viewBox="0 0 10 10" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,5 4,7.5 8.5,2.5"/></svg>';
+var chevronSvg = '<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,4.5 7,9.5 12,4.5"/></svg>';
+
+function renderTiers() {
+  var container = document.getElementById('tiers');
+  var data = freqData[currentFreq];
+  var isOnce = currentFreq === 'once';
+  container.style.display = isOnce ? 'none' : 'flex';
+  container.innerHTML = '';
+  if (!isOnce) {
+    data.forEach(function(tier, i) {
+      var isSel = i === selectedIdx;
+      var isExp = i === expandedIdx;
+      var card = document.createElement('div');
+      card.className = 'tier-card' + (isSel ? ' selected' : '') + (isExp ? ' expanded' : '');
+      var benefitsHtml = tier.benefits.map(function(b) {
+        return '<li><span class="benefit-check">' + checkSvg + '</span>' + b + '</li>';
+      }).join('');
+      var header = document.createElement('div');
+      header.className = 'tier-header';
+      header.innerHTML =
+        '<div class="tier-dot"></div>' +
+        '<div class="tier-name">' + tier.name + '</div>' +
+        '<div class="tier-price">' + tier.price + '</div>' +
+        '<div class="tier-radio"><div class="tier-radio-inner"></div></div>';
+      header.addEventListener('click', (function(idx) {
+        return function() {
+          selectedIdx = idx;
+          if (expandedIdx !== idx) expandedIdx = -1;
+          renderTiers();
+        };
+      })(i));
+      var peek = document.createElement('div');
+      peek.className = 'tier-peek';
+      peek.innerHTML =
+        '<div class="tier-benefits-label">Your membership benefits include:</div>' +
+        '<div class="tier-peek-list"><ul class="tier-benefits">' + benefitsHtml + '</ul></div>';
+      var extra = document.createElement('div');
+      extra.className = 'tier-extra';
+      extra.innerHTML = '<p class="tier-desc">' + tier.desc + '</p>';
+      var footer = document.createElement('div');
+      footer.className = 'tier-footer';
+      footer.innerHTML =
+        '<span class="tier-footer-label">' + (isExp ? 'Show less' : 'Show all benefits') + '</span>' + chevronSvg;
+      footer.addEventListener('click', (function(idx, exp) {
+        return function() {
+          selectedIdx = idx;
+          expandedIdx = exp ? -1 : idx;
+          renderTiers();
+        };
+      })(i, isExp));
+      card.appendChild(header);
+      card.appendChild(peek);
+      card.appendChild(extra);
+      card.appendChild(footer);
+      if (i === data.length - 1) {
+        var badge = document.createElement('div');
+        badge.className = 'tier-highest';
+        badge.textContent = 'OUR HIGHEST LEVEL OF SUPPORT';
+        card.appendChild(badge);
+      }
+      container.appendChild(card);
+    });
+  }
+  document.getElementById('donateBtn').textContent =
+    isOnce ? 'Donate' : 'Donate ' + freqData[currentFreq][selectedIdx].price;
+}
+
+document.querySelectorAll('.freq-tab').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.freq-tab').forEach(function(t) { t.classList.remove('active'); });
+    btn.classList.add('active');
+    currentFreq = btn.dataset.freq;
+    selectedIdx = 0;
+    expandedIdx = -1;
+    renderTiers();
+  });
+});
+
+document.querySelectorAll('.pay-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.pay-btn').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+  });
+});
+
+var phoneShell   = document.getElementById('phoneShell');
+var stickyNav    = document.getElementById('stickyNav');
+var donationSect = document.getElementById('donationSection');
+var snapDone     = false;
+var lastScroll   = 0;
+
+function getDonationTop() {
+  return donationSect.getBoundingClientRect().top -
+         phoneShell.getBoundingClientRect().top;
+}
+
+function snapToDonation() {
+  if (snapDone) return;
+  snapDone = true;
+  var offset = getDonationTop() - 44;
+  if (offset > 2) {
+    phoneShell.style.scrollBehavior = 'auto';
+    phoneShell.scrollTop += offset;
+    phoneShell.style.scrollBehavior = 'smooth';
+  }
+  stickyNav.classList.add('visible');
+}
+
+phoneShell.addEventListener('scroll', function() {
+  var st = phoneShell.scrollTop;
+  var scrollingDown = st > lastScroll;
+  lastScroll = st;
+  if (getDonationTop() <= 44) {
+    stickyNav.classList.add('visible');
+  }
+  if (!scrollingDown && st < 150) {
+    stickyNav.classList.remove('visible');
+    snapDone = false;
+  }
+}, { passive: true });
+
+donationSect.addEventListener('pointerdown', snapToDonation);
+donationSect.addEventListener('focusin', snapToDonation);
+
+renderTiers();
+</script>
+</body>
+</html>
