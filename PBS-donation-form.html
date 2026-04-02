@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=375, initial-scale=1" />
+  <title>PBS Passport Donation Form</title>
+
+  <!-- React + Babel loaded from CDN — no install needed -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #1a1a2e;
+      display: flex;
+      justify-content: center;
+      padding: 24px 0 48px;
+      min-height: 100vh;
+    }
+    #root { width: 375px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState } = React;
+
+    // ─── Figma Asset URLs (valid ~7 days from generation) ─────────────────────
+    const A = {
+      hero:        'https://www.figma.com/api/mcp/asset/f57bef47-9778-40a9-8954-6002c19a6dc7',
+      passCircle:  'https://www.figma.com/api/mcp/asset/b43ab29a-e543-4caa-9094-c76a22786d2e',
+      compass:     'https://www.figma.com/api/mcp/asset/888ecdb7-28cf-42c8-9055-c916899eb077',
+      check:       'https://www.figma.com/api/mcp/asset/842ff63f-abce-44d2-b428-0442fed4c10b',
+      chevDown:    'https://www.figma.com/api/mcp/asset/23fd38c7-d937-41d7-8040-af6b800195fa',
+      chevUp:      'https://www.figma.com/api/mcp/asset/4d60b313-78e5-4f27-8f8f-982b70ddf770',
+      heart:       'https://www.figma.com/api/mcp/asset/663b3051-254b-4558-b2b3-4430ac7ef948',
+      nprLogo:     'https://www.figma.com/api/mcp/asset/baf40390-0af8-47f6-8c82-ba0631b5b26f',
+      // Payment method icons are drawn as inline SVGs (see IconCreditCard etc.)
+    };
+
+    // ─── PBS Design Tokens ────────────────────────────────────────────────────
+    const C = {
+      midnight:   '#000525',
+      white:      '#FFFFFF',
+      blue:       '#5680FF',
+      shadow:     '#363846',
+      pebble:     '#94A1B2',
+      slate:      '#5C6E85',
+      fog:        '#EEF0F5',
+      yellow:     '#FFCF00',
+      green:      '#087B45',
+      mist:       '#C8CDD6',
+      cardBg:     'rgba(61,74,107,0.2)',
+      cardBorder: 'rgba(148,161,178,0.5)',
+      dark:       '#0C1333',
+    };
+
+    const FONT = "'PBS Sans', system-ui, -apple-system, sans-serif";
+
+    // ─── Tier Data ────────────────────────────────────────────────────────────
+    const TIERS = [
+      {
+        id: 'members',
+        name: 'Panhandle PBS Members',
+        price: '$10/mo', amount: '$10',
+        intro: 'Your membership benefits include:',
+        badge: null, hasNpr: false,
+        benefits: [
+          'Panhandle PBS Passport unlocks more of your PBS programs in the PBS app.',
+          'Access to the Member Services Line',
+        ],
+      },
+      {
+        id: 'leaders',
+        name: 'Panhandle PBS Leaders + NPR Bundle',
+        price: '$30/mo', amount: '$30',
+        intro: 'Panhandle PBS Leaders get all membership benefits plus:',
+        badge: 'MOST POPULAR 🔥', hasNpr: true,
+        benefits: [
+          'Discounted tickets to events',
+          'Annual Leaders feedback forum',
+        ],
+      },
+      {
+        id: 'champions',
+        name: 'Panhandle PBS Champions',
+        price: '$75/mo', amount: '$75',
+        intro: 'Panhandle PBS Champions get all memberships benefits, plus...',
+        badge: null, hasNpr: false,
+        benefits: [
+          'Spotlight tours of Panhandle PBS studios!',
+          'An exclusive Insight Panel, inviting you to give',
+        ],
+      },
+      {
+        id: 'beacon',
+        name: 'Panhandle PBS Beacon Circle',
+        price: '$200/mo', amount: '$200',
+        intro: 'Panhandle PBS Beacon Circle patrons get all membership benefits, plus\u2026',
+        badge: null, hasNpr: false,
+        benefits: [
+          'Invitations to gatherings with Panhandle PBS, NPR and PBS talent and leadership.',
+          'Special invitations to events hosted by Panhandle PBS partner organizations',
+          'Access to the Beacon Circle Concierge Line and one-on-one Passport support',
+          'Private, personalized Panhandle PBS studio tours',
+          'First access to select Panhandle PBS events',
+          'On-air recognition, Speakers Series tickets and other perks for Beacon Circle Benefactors and Innovators.',
+        ],
+      },
+    ];
+
+    // ─── GreenCheck ──────────────────────────────────────────────────────────
+    function GreenCheck() {
+      return (
+        <span style={{
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+          width: 10, height: 10, borderRadius: '50%',
+          backgroundColor: C.green, flexShrink: 0, marginTop: 2,
+        }}>
+          <img src={A.check} alt="" style={{ width: 5, height: 3.75, display: 'block' }} />
+        </span>
+      );
+    }
+
+    // ─── Radio button ─────────────────────────────────────────────────────────
+    function Radio({ selected }) {
+      return (
+        <span aria-hidden="true" style={{
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+          width: 18, height: 18, borderRadius: '50%',
+          border: `1.667px solid ${C.blue}`, flexShrink: 0,
+          transition: 'all 0.15s ease', boxSizing: 'border-box',
+        }}>
+          {selected && (
+            <span style={{
+              width: 10, height: 10, borderRadius: '50%',
+              backgroundColor: C.blue, display: 'block',
+            }} />
+          )}
+        </span>
+      );
+    }
+
+    // ─── TierCard ─────────────────────────────────────────────────────────────
+    function TierCard({ tier, isExpanded, isSelected, onSelect, onToggle }) {
+      return (
+        <div style={{
+          position: 'relative', width: 343, backgroundColor: C.cardBg,
+          borderRadius: 14, boxSizing: 'border-box', overflow: 'hidden',
+          border: isSelected ? `2.5px solid ${C.blue}` : `1px solid ${C.cardBorder}`,
+          transition: 'border-color 0.2s ease, border-width 0.2s ease',
+        }}>
+          {/* Card body */}
+          <div style={{ padding: '18px 12px 0 12px' }}>
+
+            {/* Header row — clicking selects the tier */}
+            <div
+              role="button" tabIndex={0}
+              aria-label={`Select ${tier.name}`}
+              onClick={() => onSelect(tier.id)}
+              onKeyDown={(e) => e.key === 'Enter' && onSelect(tier.id)}
+              style={{
+                display: 'flex',
+                alignItems: tier.id === 'leaders' ? 'flex-start' : 'center',
+                gap: 10, marginBottom: 16,
+                cursor: 'pointer', outline: 'none', userSelect: 'none',
+              }}
+            >
+              <p style={{
+                margin: 0, fontFamily: FONT, fontSize: 16, fontWeight: 700,
+                lineHeight: 1.25, color: C.blue, flex: 1, minWidth: 0,
+              }}>{tier.name}</p>
+
+              <div style={{ display: 'flex', gap: 5, alignItems: 'center', flexShrink: 0 }}>
+                <span style={{
+                  fontFamily: FONT, fontSize: 13, fontWeight: 400,
+                  color: C.white, whiteSpace: 'nowrap', lineHeight: 1.25,
+                }}>{tier.price}</span>
+                <Radio selected={isSelected} />
+              </div>
+            </div>
+
+            {/* Intro label */}
+            <p style={{
+              margin: '0 0 12px 0', fontFamily: FONT, fontSize: 12,
+              fontWeight: 400, lineHeight: 1.55, color: C.pebble,
+            }}>{tier.intro}</p>
+
+            {/* Benefits area */}
+            <div style={{ position: 'relative' }}>
+              {/* NPR+ logo (Leaders only) */}
+              {tier.hasNpr && (
+                <div style={{
+                  position: 'absolute', left: 0, top: 0, width: 95,
+                  height: 40, display: 'flex', alignItems: 'center',
+                  pointerEvents: 'none', zIndex: 1,
+                }}>
+                  <img src={A.nprLogo} alt="NPR+" style={{ width: 95, height: 28, objectFit: 'contain' }} />
+                </div>
+              )}
+
+              {/* Collapsible list */}
+              <div style={{
+                maxHeight: isExpanded ? 600 : 56,
+                overflow: 'hidden',
+                transition: 'max-height 0.35s ease',
+                position: 'relative',
+                marginLeft: tier.hasNpr ? 110 : 0,
+              }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16, paddingBottom: 4 }}>
+                  {tier.benefits.map((text, i) => (
+                    <div key={i} style={{ display: 'flex', gap: 6, alignItems: 'flex-start' }}>
+                      <GreenCheck />
+                      <p style={{
+                        margin: 0, fontFamily: FONT, fontSize: 12,
+                        fontWeight: 400, lineHeight: 1.25, flex: 1,
+                        color: i === 0 ? C.mist : C.white,
+                      }}>{text}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Gradient fade — collapsed only */}
+                {!isExpanded && (
+                  <div aria-hidden="true" style={{
+                    position: 'absolute', bottom: 0, left: -8, right: -8, height: '75%',
+                    background: `linear-gradient(to bottom, rgba(12,19,51,0), ${C.dark})`,
+                    pointerEvents: 'none',
+                  }} />
+                )}
+              </div>
+            </div>
+
+            {/* Chevron — clicking expands/collapses independently */}
+            <button
+              aria-label={isExpanded ? `Collapse ${tier.name}` : `Expand ${tier.name}`}
+              onClick={(e) => { e.stopPropagation(); onToggle(tier.id); }}
+              style={{
+                display: 'flex', width: '100%', alignItems: 'center',
+                justifyContent: 'center', padding: '10px 0',
+                background: 'none', border: 'none', cursor: 'pointer', outline: 'none',
+              }}
+            >
+              <img src={isExpanded ? A.chevUp : A.chevDown} alt="" style={{ width: 12, height: 6 }} />
+            </button>
+
+            {!tier.badge && <div style={{ height: 8 }} />}
+          </div>
+
+          {/* MOST POPULAR badge */}
+          {tier.badge && (
+            <div style={{
+              width: '100%', height: 27, backgroundColor: C.yellow,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <span style={{
+                fontFamily: FONT, fontSize: 14, fontWeight: 700,
+                lineHeight: 1.5, color: C.midnight, textTransform: 'uppercase',
+              }}>{tier.badge}</span>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // ─── Inline SVG icons for payment methods (no external assets needed) ───────
+    function IconCreditCard() {
+      return (
+        <svg width="22" height="16" viewBox="0 0 22 16" fill="none" xmlns="http://www.w3.org/2000/svg" style={{flexShrink:0}}>
+          <rect x="0.5" y="0.5" width="21" height="15" rx="2.5" stroke="rgba(255,255,255,0.7)"/>
+          <rect x="0" y="4" width="22" height="4" fill="rgba(255,255,255,0.35)"/>
+          <rect x="3" y="10" width="5" height="2" rx="0.5" fill="rgba(255,255,255,0.55)"/>
+          <rect x="10" y="10" width="3" height="2" rx="0.5" fill="rgba(255,255,255,0.35)"/>
+        </svg>
+      );
+    }
+
+    function IconBank() {
+      return (
+        <svg width="18" height="16" viewBox="0 0 18 16" fill="none" xmlns="http://www.w3.org/2000/svg" style={{flexShrink:0}}>
+          <path d="M9 0L18 5.5H0L9 0Z" fill="rgba(255,255,255,0.75)"/>
+          <rect x="1"  y="7" width="2.5" height="6" rx="0.5" fill="rgba(255,255,255,0.65)"/>
+          <rect x="5"  y="7" width="2.5" height="6" rx="0.5" fill="rgba(255,255,255,0.65)"/>
+          <rect x="9"  y="7" width="2.5" height="6" rx="0.5" fill="rgba(255,255,255,0.65)"/>
+          <rect x="13" y="7" width="2.5" height="6" rx="0.5" fill="rgba(255,255,255,0.65)"/>
+          <rect x="0" y="14" width="18" height="2" rx="0.5" fill="rgba(255,255,255,0.75)"/>
+        </svg>
+      );
+    }
+
+    function IconApplePay() {
+      // Apple Pay wordmark — drawn as SVG text paths approximation
+      return (
+        <svg width="52" height="16" viewBox="0 0 52 16" fill="none" xmlns="http://www.w3.org/2000/svg" style={{flexShrink:0}}>
+          {/* Apple logo mark */}
+          <path d="M8.5 3C9.1 2.2 9.5 1.1 9.3 0C8.3 0.05 7.1 0.65 6.4 1.45C5.75 2.15 5.3 3.25 5.55 4.3C6.65 4.35 7.85 3.75 8.5 3Z" fill="white"/>
+          <path d="M9.3 4.5C7.8 4.4 6.5 5.3 5.8 5.3C5.1 5.3 3.95 4.55 2.75 4.55C1.15 4.6 -0.3 5.55 -1 7.05C-2.4 10.05 -1.35 14.55 0.05 17.05C0.7 18.3 1.55 19.7 2.7 19.65C3.85 19.6 4.3 18.9 5.7 18.9C7.1 18.9 7.5 19.65 8.75 19.65C9.9 19.6 10.65 18.35 11.3 17.1C12.05 15.7 12.35 14.35 12.35 14.3C12.3 14.25 9.9 13.4 9.85 10.45C9.8 7.95 11.7 6.75 11.8 6.65C10.75 5.1 9.1 4.55 9.3 4.5Z" fill="white" transform="scale(0.65) translate(1, -2)"/>
+          {/* "Pay" text */}
+          <text x="16" y="12" fontFamily="'Helvetica Neue', Helvetica, Arial, sans-serif" fontSize="11" fontWeight="600" fill="white" letterSpacing="-0.3">Pay</text>
+        </svg>
+      );
+    }
+
+    function IconPayPal() {
+      return (
+        <svg width="58" height="16" viewBox="0 0 58 16" fill="none" xmlns="http://www.w3.org/2000/svg" style={{flexShrink:0}}>
+          <text x="0" y="12" fontFamily="'Helvetica Neue', Helvetica, Arial, sans-serif" fontSize="12" fontWeight="700" fill="#009cde" letterSpacing="-0.2">Pay</text>
+          <text x="22" y="12" fontFamily="'Helvetica Neue', Helvetica, Arial, sans-serif" fontSize="12" fontWeight="700" fill="#012169" letterSpacing="-0.2">Pal</text>
+        </svg>
+      );
+    }
+
+    // ─── Payment button shared style ──────────────────────────────────────────
+    const payBtnBase = {
+      width: 144, height: 36,
+      backgroundColor: 'rgba(61,74,107,0.2)',
+      border: '1px solid rgba(148,161,178,0.3)',
+      borderRadius: 5, display: 'flex', alignItems: 'center',
+      justifyContent: 'center', cursor: 'pointer', outline: 'none',
+      gap: 7, padding: '0 12px', boxSizing: 'border-box',
+    };
+
+    // ─── Main Component ───────────────────────────────────────────────────────
+    function PBSPassportDonation() {
+      const [expandedId, setExpandedId] = useState(null);
+      const [selectedId, setSelectedId] = useState(null);
+      const [frequency,  setFrequency]  = useState('Monthly');
+      const [addFee,     setAddFee]     = useState(false);
+
+      const selectedTier = TIERS.find((t) => t.id === selectedId) ?? null;
+      const handleToggle = (id) => setExpandedId((p) => p === id ? null : id);
+      const handleSelect = (id) => setSelectedId((p) => p === id ? null : id);
+
+      return (
+        <div style={{
+          width: 375, margin: '0 auto', backgroundColor: C.midnight,
+          fontFamily: FONT, position: 'relative', minHeight: '100vh', overflowX: 'hidden',
+        }}>
+
+          {/* ── Hero + Intro (244px, text overlaps hero bottom) ── */}
+          <div style={{ position: 'relative', height: 244 }}>
+
+            {/* Hero image */}
+            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 153, overflow: 'hidden' }}>
+              <img src={A.hero} alt="PBS shows" style={{
+                position: 'absolute', width: '115.64%', height: '160.25%',
+                left: '-12.49%', top: '-0.12%', objectFit: 'cover', display: 'block',
+              }} />
+              <div style={{
+                position: 'absolute', top: '43.79%', left: 0, right: 0, bottom: 0, opacity: 0.9,
+                background: `linear-gradient(-0.73deg, ${C.midnight} 13.87%, rgba(0,5,37,0.46) 66.34%, rgba(0,5,37,0.162) 85.87%, rgba(0,5,37,0) 96.45%)`,
+              }} />
+              <div style={{
+                position: 'absolute', top: '35.88%', left: 0, right: 0, bottom: '-2.65%',
+                background: `linear-gradient(-0.86deg, ${C.midnight} 13.87%, rgba(0,5,37,0.365) 66.34%, rgba(0,5,37,0) 96.45%)`,
+              }} />
+            </div>
+
+            {/* Dark overlay */}
+            <div style={{
+              position: 'absolute', top: 0, left: 0, right: 0, height: 157,
+              backgroundColor: C.midnight, opacity: 0.3, pointerEvents: 'none',
+            }} />
+
+            {/* Text starts at y=85 */}
+            <div style={{ position: 'absolute', top: 85, left: 16, right: 16 }}>
+
+              {/* Title lockup */}
+              <div style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                gap: 3.4, marginBottom: 16, flexWrap: 'nowrap',
+              }}>
+                <span style={{ fontFamily: FONT, fontSize: 19.684, fontWeight: 700, color: C.white, lineHeight: 1, whiteSpace: 'nowrap' }}>
+                  Panhandle PBS
+                </span>
+                <span style={{ position: 'relative', width: 18, height: 18, flexShrink: 0, display: 'inline-block' }}>
+                  <img src={A.passCircle} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }} />
+                  <img src={A.compass}    alt="" style={{ position: 'absolute', width: 16.14, height: 16.06, top: '50%', left: '50%', transform: 'translate(-50%,-50%)' }} />
+                </span>
+                <span style={{ fontFamily: FONT, fontSize: 19.684, fontWeight: 700, color: C.white, lineHeight: 1, whiteSpace: 'nowrap' }}>
+                  Passport
+                </span>
+              </div>
+
+              {/* Intro paragraph */}
+              <p style={{ margin: '0 0 6px', fontFamily: FONT, fontSize: 14, fontWeight: 400, lineHeight: 1.5, color: C.white }}>
+                Support Panhandle PBS to ensure programs that educate, inform, and inspire continue
+                to thrive in our community. Your donation makes a difference!
+              </p>
+
+              {/* Bold pitch */}
+              <p style={{ margin: 0, fontFamily: FONT, fontSize: 14, fontWeight: 700, lineHeight: 1.25, color: C.white }}>
+                With a donation of at least $8 per month or a one-time donation of $35, become a
+                station member and enjoy <span style={{ color: C.yellow }}>Panhandle PBS Passport</span>.
+              </p>
+            </div>
+          </div>
+
+          {/* 27px gap */}
+          <div style={{ height: 27 }} />
+
+          {/* ── Donation Amount section ── */}
+          <div style={{ padding: '0 16px' }}>
+            <p style={{
+              margin: '0 0 14px', fontFamily: FONT, fontSize: 14,
+              fontWeight: 700, lineHeight: 1.25, color: C.white, textAlign: 'center',
+            }}>Donation Amount</p>
+
+            {/* Frequency toggle */}
+            <div style={{
+              display: 'flex', backgroundColor: C.shadow, borderRadius: 100,
+              padding: 2, width: 343, opacity: 0.88, marginBottom: 14,
+            }}>
+              {['Monthly', 'Yearly', 'One-Time'].map((label) => {
+                const active = frequency === label;
+                return (
+                  <button key={label} onClick={() => setFrequency(label)} style={{
+                    flex: 1, height: 32, border: 'none', borderRadius: 100,
+                    backgroundColor: active ? C.white : 'transparent',
+                    color: active ? C.midnight : C.fog,
+                    fontFamily: FONT, fontSize: 13, fontWeight: 700,
+                    cursor: 'pointer', outline: 'none',
+                    transition: 'background-color 0.2s, color 0.2s',
+                  }}>{label}</button>
+                );
+              })}
+            </div>
+
+            {/* Tier cards */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, alignItems: 'center' }}>
+              {TIERS.map((tier) => (
+                <TierCard
+                  key={tier.id} tier={tier}
+                  isExpanded={expandedId === tier.id}
+                  isSelected={selectedId === tier.id}
+                  onSelect={handleSelect}
+                  onToggle={handleToggle}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* ── Payment Method ── */}
+          <div style={{ paddingTop: 32 }}>
+            <p style={{
+              margin: '0 0 16px', fontFamily: FONT, fontSize: 14,
+              fontWeight: 700, lineHeight: 1.25, color: C.white, textAlign: 'center',
+            }}>Payment Method</p>
+
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, justifyContent: 'center', padding: '0 16px' }}>
+              {/* Credit Card */}
+              <button style={payBtnBase}>
+                <IconCreditCard />
+                <span style={{ fontFamily: FONT, fontSize: 13, color: C.white, whiteSpace: 'nowrap' }}>Credit Card</span>
+              </button>
+
+              {/* Bank Account */}
+              <button style={payBtnBase}>
+                <IconBank />
+                <span style={{ fontFamily: FONT, fontSize: 13, color: C.white, whiteSpace: 'nowrap' }}>Bank Account</span>
+              </button>
+
+              {/* Apple Pay */}
+              <button style={payBtnBase}>
+                <IconApplePay />
+              </button>
+
+              {/* PayPal */}
+              <button style={payBtnBase}>
+                <IconPayPal />
+              </button>
+            </div>
+
+            {/* Processing fee checkbox */}
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, padding: '16px 38px 0' }}>
+              <input type="checkbox" id="fee" checked={addFee} onChange={() => setAddFee((f) => !f)}
+                style={{ width: 14, height: 14, flexShrink: 0, marginTop: 2, accentColor: C.blue, cursor: 'pointer' }} />
+              <label htmlFor="fee" style={{
+                fontFamily: FONT, fontSize: 13, fontWeight: 400,
+                lineHeight: 1.5, color: C.fog, cursor: 'pointer',
+              }}>
+                Maximize my impact by adding 4% to help with processing fees.
+              </label>
+            </div>
+          </div>
+
+          {/* ── Donate button + footer ── */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '32px 16px', gap: 10 }}>
+            <button
+              disabled={!selectedTier}
+              style={{
+                width: 232, height: 34, borderRadius: 28.6, border: 'none',
+                backgroundColor: selectedTier ? C.blue : C.slate,
+                color: selectedTier ? C.white : C.shadow,
+                fontFamily: FONT, fontSize: 13, fontWeight: 700, lineHeight: 1.25,
+                cursor: selectedTier ? 'pointer' : 'not-allowed',
+                transition: 'background-color 0.25s ease, color 0.25s ease',
+              }}
+            >
+              {selectedTier ? `Donate ${selectedTier.amount}/month` : 'Donate'}
+            </button>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+              <img src={A.heart} alt="❤️" style={{ width: 10, height: 9, flexShrink: 0 }} />
+              <span style={{ fontFamily: FONT, fontSize: 13, color: C.white, whiteSpace: 'nowrap' }}>
+                Your donation goes to your local station!
+              </span>
+            </div>
+          </div>
+
+        </div>
+      );
+    }
+
+    // ─── Mount ────────────────────────────────────────────────────────────────
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<PBSPassportDonation />);
+  </script>
+</body>
+</html>
